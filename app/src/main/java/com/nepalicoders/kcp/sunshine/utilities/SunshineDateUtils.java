@@ -18,7 +18,7 @@ package utilities;
 import android.content.Context;
 import android.text.format.DateUtils;
 
-import com.example.android.sunshine.R;
+import com.nepalicoders.kcp.sunshine.R;
 
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
