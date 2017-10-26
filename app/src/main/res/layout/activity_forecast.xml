@@ -1,31 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--TODO (1) Change the ConstraintLayout to a FrameLayout-->
-<!--TODO (7) Remove the line that declares the id, we don't need it-->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.nepalicoders.kcp.sunshine.ForecastActivity">
-    <!--TODO (8) Wrap the TextView in a ScrollView-->
-    <!--TODO (9) Set the ScrollView width to match_parent and the height to wrap_content-->
+    android:layout_height="match_parent">
 
-    <!--TODO (2) Change the TextView's android:id attribute to tv_weather_data-->
-    <!--TODO (3) Give the TextView 16dp of padding-->
-    <!--TODO (4) Set the text size to 20sp-->
-    <!--TODO (5) Remove all attributes with the word constraint in them-->
-    <!--TODO (6) Remove the default text from the TextView-->
-
-    <ScrollView
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerview_forecast"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"/>
 
-        <TextView
-            android:id="@+id/tv_weather_data"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="20sp"/>
+    <TextView
+        android:id="@+id/tv_error_message_display"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="@string/error_message"
+        android:textSize="20sp"
+        android:visibility="invisible" />
 
-    </ScrollView>
+    <ProgressBar
+        android:id="@+id/pb_loading_indicator"
+        android:layout_height="42dp"
+        android:layout_width="42dp"
+        android:layout_gravity="center"
+        android:visibility="invisible" />
 
 </FrameLayout>

@@ -1,4 +1,4 @@
-package data;
+package com.nepalicoders.kcp.sunshine.data;
 
 import android.content.Context;
 

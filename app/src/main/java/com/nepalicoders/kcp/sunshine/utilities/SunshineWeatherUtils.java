@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package utilities;
+package com.nepalicoders.kcp.sunshine.utilities;
 
 import android.content.Context;
 import android.util.Log;
 import com.nepalicoders.kcp.sunshine.R;
-import data.SunshinePreferences;
+import com.nepalicoders.kcp.sunshine.data.SunshinePreferences;
 
 /**
  * Contains useful utilities for a weather app, such as conversion between Celsius and Fahrenheit,
