@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONException;
 
@@ -20,7 +21,7 @@ import com.nepalicoders.kcp.sunshine.data.SunshinePreferences;
 import com.nepalicoders.kcp.sunshine.utilities.NetworkUtils;
 import com.nepalicoders.kcp.sunshine.utilities.OpenWeatherJsonUtils;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ForecastAdapter.ForecastAdapterOnClickHandler {
     private RecyclerView mRecyclerView;
     private ForecastAdapter mForecastAdapter;
     private TextView mErrorMessageTextView;
@@ -40,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setHasFixedSize(true);
 
         //connecting adapter
-        mForecastAdapter = new ForecastAdapter();
+        mForecastAdapter = new ForecastAdapter(this);
         mRecyclerView.setAdapter(mForecastAdapter);
 
         mLoadingProgressBar = (ProgressBar) findViewById(R.id.pb_loading_indicator);
@@ -61,6 +62,12 @@ public class MainActivity extends AppCompatActivity {
     public void showErrorMessage() {
         mErrorMessageTextView.setVisibility(View.VISIBLE);
         mRecyclerView.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public void onClick(String weatherForDay) {
+        Toast.makeText(this, weatherForDay, Toast.LENGTH_SHORT)
+                .show();
     }
 
     public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {

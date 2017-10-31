@@ -15,20 +15,49 @@ import android.widget.TextView;
 public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ForecastAdapterViewHolder>{
 
     private String[] mWeatherData;
+    final private ForecastAdapterOnClickHandler mClickHandler;
 
-    public ForecastAdapter(){
-
+    /**
+     * The interface that receives onClick messages.
+     */
+    interface ForecastAdapterOnClickHandler{
+        void onClick(String weatherForDay);
     }
 
-    class ForecastAdapterViewHolder extends RecyclerView.ViewHolder{
+
+    public ForecastAdapter(ForecastAdapterOnClickHandler mClickHandler){
+        this.mClickHandler = mClickHandler;
+    }
+
+
+    /**
+     * Cache of the children views for a forecast list item.
+     */
+
+    class ForecastAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         public final TextView mWeatherTextView;
 
         public ForecastAdapterViewHolder(View itemView) {
             super(itemView);
             mWeatherTextView = (TextView) itemView.findViewById(R.id.tv_weather_data);
+            //setOnClickListener on the view passed into the constructor
+            itemView.setOnClickListener(this);
+        }
+
+        /**
+         * This gets called by the child views during a click.
+         *
+         * @param v The View that was clicked
+         */
+        @Override
+        public void onClick(View v) {
+            int adapterPosition = getAdapterPosition();
+            String weatherForDay = mWeatherData[adapterPosition];
+            mClickHandler.onClick(weatherForDay);
         }
     }
+
     @Override
     public ForecastAdapterViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         Context context = viewGroup.getContext();
