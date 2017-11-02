@@ -4,8 +4,11 @@ import android.app.LoaderManager;
 import android.content.AsyncTaskLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,12 +26,13 @@ import com.nepalicoders.kcp.sunshine.utilities.OpenWeatherJsonUtils;
 
 import java.net.URL;
 
-public class MainActivity extends AppCompatActivity implements ForecastAdapter.ForecastAdapterOnClickHandler, LoaderManager.LoaderCallbacks<String[]> {
+public class MainActivity extends AppCompatActivity implements ForecastAdapter.ForecastAdapterOnClickHandler, LoaderManager.LoaderCallbacks<String[]>,SharedPreferences.OnSharedPreferenceChangeListener {
     private final static int FORECAST_LOADER_ID = 0;
     private RecyclerView mRecyclerView;
     private ForecastAdapter mForecastAdapter;
     private TextView mErrorMessageTextView;
     private ProgressBar mLoadingProgressBar;
+    private static boolean PREFERENCES_HAVE_BEEN_UPDATED = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,24 +59,40 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapter.F
         //start the loader
         getLoaderManager().initLoader(loaderId, bundleForLoader, callback);
 
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .registerOnSharedPreferenceChangeListener(this);
+
     }
 
-//    private void loadWeatherData() {
-//        String location = SunshinePreferences.getPreferredWeatherLocation(this);
-//
-//        //adding location in a bundle to access it onResume
-//        Bundle queryBundle = new Bundle();
-//        queryBundle.putString(FORECAST_LOCATION_EXTRA, location);
-//
-//        //loading weather of given location
-//        LoaderManager loaderManager = getLoaderManager();
-//        Loader<Object> weatherSearchLoader = loaderManager.getLoader(FORECAST_LOADER_ID);
-//        if (weatherSearchLoader == null) {
-//            loaderManager.initLoader(FORECAST_LOADER_ID, queryBundle, MainActivity.this);
-//        } else {
-//            loaderManager.restartLoader(FORECAST_LOADER_ID, queryBundle, MainActivity.this);
-//        }
-//    }
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        /*
+         * If the preferences for location or units have changed since the user was last in
+         * MainActivity, perform another query and set the flag to false.
+         *
+         * This isn't the ideal solution because there really isn't a need to perform another
+         * GET request just to change the units, but this is the simplest solution that gets the
+         * job done for now. Later in this course, we are going to show you more elegant ways to
+         * handle converting the units from celsius to fahrenheit and back without hitting the
+         * network again by keeping a copy of the data in a manageable format.
+         */
+        if (PREFERENCES_HAVE_BEEN_UPDATED) {
+            Log.d("MainActivity", "onStart: preferences were updated");
+            getLoaderManager().restartLoader(FORECAST_LOADER_ID, null, this);
+            PREFERENCES_HAVE_BEEN_UPDATED = false;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        /* Unregister MainActivity as an OnPreferenceChangedListener to avoid any memory leaks. */
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .unregisterOnSharedPreferenceChangeListener(this);
+    }
 
     @Override
     public Loader<String[]> onCreateLoader(int id, final Bundle loaderArgs) {
@@ -160,9 +180,12 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapter.F
             mForecastAdapter.setWeatherData(null);
             getLoaderManager().restartLoader(FORECAST_LOADER_ID,null,MainActivity.this);
             return true;
-        }
-        if (selectedMenu == R.id.action_map) {
+        }else if (selectedMenu == R.id.action_map) {
             openLocationInMap();
+            return true;
+        }else if (selectedMenu == R.id.action_setting){
+            Intent settingsIntent = new Intent(this,SettingsActivity.class);
+            startActivity(settingsIntent);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -179,8 +202,9 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapter.F
     }
 
     private void openLocationInMap() {
-        String addressString = "1600 Ampitheatre Parkway, CA";
+        String addressString = SunshinePreferences.getPreferredWeatherLocation(this);
         Uri geoLocation = Uri.parse("geo:0,0?q=" + addressString);
+
 
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(geoLocation);
@@ -193,4 +217,8 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapter.F
         }
     }
 
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        PREFERENCES_HAVE_BEEN_UPDATED = true;
+    }
 }
