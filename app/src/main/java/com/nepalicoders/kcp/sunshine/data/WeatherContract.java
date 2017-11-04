@@ -1,4 +1,4 @@
-package com.nepalicoders.kcp.sunshine;
+package com.nepalicoders.kcp.sunshine.data;
 
 import android.provider.BaseColumns;
 
